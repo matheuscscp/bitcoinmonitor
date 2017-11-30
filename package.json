@@ -1,0 +1,13 @@
+{
+  "name": "castle-crush-telegram-bot",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {},
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "request": "^2.83.0",
+    "telegram-bot-api": "^1.2.0"
+  }
+}
