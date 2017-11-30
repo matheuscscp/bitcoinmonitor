@@ -11,7 +11,8 @@ const getValueMins = 5
 
 // globals
 let threshold = 2000
-let value = 0
+let currentValue = 0
+let baseValue = 0
 let waitingInput = null
 
 // bot
@@ -19,7 +20,7 @@ const bot = new TelegramBot({ token: process.env.BOT_TOKEN, updates: { enabled: 
 const botMessage = (text) => { bot.sendMessage({ chat_id: chatId, text }) }
 bot.on('update', (update) => {
   if (!update.message || update.message.chat.id != chatId) return
-  if (waitingInput != null && waitingInput == update.message.from.id) {
+  if (waitingInput == update.message.from.id) {
     const val = Number(update.message.text)
     if (isNaN(val)) {
       botMessage('nao saquei, fala um numero')
@@ -29,6 +30,11 @@ bot.on('update', (update) => {
       botMessage('ok')
     }
   } else if (update.message.text == '/healthcheck@bitcoinmonitor_bot') {
+    let msg = 'to vivao\n'
+    msg += `threshold: ${threshold}\n`
+    msg += `currentValue: ${currentValue}\n`
+    msg += `baseValue: ${baseValue}\n`
+    msg += `${url}`
     botMessage('to vivao')
   } else if (update.message.text == '/threshold@bitcoinmonitor_bot') {
     waitingInput = update.message.from.id
@@ -36,17 +42,17 @@ bot.on('update', (update) => {
   }
 })
 
-const getValue = () => {
-  setTimeout(getValue, getValueMins*60*1000) // loop
+const fetchValue = () => {
+  setTimeout(fetchValue, getValueMins*60*1000) // loop
   request({ url, json: true }, (error, response, body) => {
-    const val = body.ticker_24h.total.last
-    const diff = val - value
-    if (value != 0 && Math.abs(diff) > threshold) {
-      value = val
-      botMessage('dectectei uma diferenca grande!')
+    currentValue = body.ticker_24h.total.last
+    if (baseValue == 0) baseValue = currentValue
+    else if (Math.abs(currentValue - baseValue) > threshold) {
+      baseValue = currentValue
+      botMessage(`dectectei uma diferenca grande! ${url}`)
     }
   })
 }
 
 // main
-getValue()
+fetchValue()
