@@ -35,7 +35,7 @@ bot.on('update', (update) => {
     msg += `currentValue: ${currentValue}\n`
     msg += `baseValue: ${baseValue}\n`
     msg += `${url}`
-    botMessage('to vivao')
+    botMessage(msg)
   } else if (update.message.text == '/threshold@bitcoinmonitor_bot') {
     waitingInput = update.message.from.id
     botMessage('qual o novo threshold?')
