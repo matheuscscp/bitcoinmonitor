@@ -45,11 +45,18 @@ bot.on('update', (update) => {
 const fetchValue = () => {
   setTimeout(fetchValue, getValueMins*60*1000) // loop
   request({ url, json: true }, (error, response, body) => {
+    const previousValue = currentValue
     currentValue = body.ticker_24h.total.last
     if (baseValue == 0) baseValue = currentValue
     else if (Math.abs(currentValue - baseValue) > threshold) {
+      let msg = 'dectectei uma diferenca grande!\n'
+      msg += `threshold: ${threshold}\n`
+      msg += `previousValue (${getValueMins} minutes ago): ${previousValue}\n`
+      msg += `baseValue: ${baseValue}\n`
+      msg += `newValue: ${currentValue}\n`
+      msg += `${url}`
       baseValue = currentValue
-      botMessage(`dectectei uma diferenca grande! ${url}`)
+      botMessage(msg)
     }
   })
 }
